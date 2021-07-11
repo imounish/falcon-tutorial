@@ -5,6 +5,11 @@ name = "pypi"
 
 [packages]
 falcon = ">=3.*"
+gunicorn = "*"
+uvicorn = "*"
+httpie = "*"
+aiofiles = "*"
+pillow = "*"
 
 [dev-packages]
 black = "*"
