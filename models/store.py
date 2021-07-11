@@ -17,6 +17,7 @@ class Image:
 
     @property
     def path(self):
+        print(str(self._config.storage_path / self.image_id))
         return self._config.storage_path / self.image_id
 
     @property
@@ -79,7 +80,7 @@ class Store:
         converted = await loop.run_in_executor(None, self._convert, image)
 
         path = self._config.storage_path / image_id
-        print("Actual Path: " + path)
+        print("Actual Path: " + str(path))
         async with aiofiles.open(path, 'wb') as output:
             await output.write(converted)
 

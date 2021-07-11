@@ -6,8 +6,9 @@ services:
     build: .
     restart: always
     volumes:
-      - image-data:/storage/images/
-      - .:/home/appuser/.
+      - image-data:/storage/images
+      - .:/app/.
+      - ./logs:/logs
     ports:
       - 5000:5000
     networks:
