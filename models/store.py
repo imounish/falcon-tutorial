@@ -31,6 +31,17 @@ class Image:
             'size': self.size,
         }
 
+    def thumbnails(self):
+        def reductions(size, min_size):
+            width, height = size
+            factor = 2
+            while width // factor >= min_size and height // factor >= min_size:
+                yield width // factor, height // factor
+                factor *= 2
+
+        return [f'/thumbnails/{self.image_id}/{width}x{height}.jpeg'
+                for width, height in reductions(self.size, self._config.min_thumb_size)]
+
 
 class Store:
 
@@ -48,6 +59,14 @@ class Store:
         rgb_image.save(converted, 'JPEG')
         return converted.getvalue()
 
+    def _resize(self, data, size):
+        image = PIL.Image.open(io.BytesIO(data))
+        image.thumbnail(size)
+
+        resized = io.BytesIO()
+        image.save(resized, 'JPEG')
+        return resized.getvalue()
+
     def get(self, image_id):
         return self._images.get(image_id)
 
@@ -60,9 +79,17 @@ class Store:
         converted = await loop.run_in_executor(None, self._convert, image)
 
         path = self._config.storage_path / image_id
+        print("Actual Path: " + path)
         async with aiofiles.open(path, 'wb') as output:
             await output.write(converted)
 
         stored = Image(self._config, image_id, image.size)
         self._images[image_id] = stored
         return stored
+
+    async def make_thumbnail(self, image, size):
+        async with aiofiles.open(image.path, 'rb') as img_file:
+            data = await img_file.read()
+
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self._resize, data, size)

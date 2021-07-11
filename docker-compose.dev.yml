@@ -1,12 +1,13 @@
 version: "3.7"
 
 services:
-  backend:
-    container_name: backend
-    build: ./backend
+  falcon-second:
+    container_name: falcon-second
+    build: .
     restart: always
     volumes:
-      - ./backend:/home/appuser/.
+      - image-data:/storage/images/
+      - .:/home/appuser/.
     ports:
       - 5000:5000
     networks:
@@ -16,3 +17,5 @@ services:
 
 networks:
   backnet:
+volumes:
+  image-data:

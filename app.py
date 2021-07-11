@@ -2,7 +2,7 @@ import falcon.asgi
 
 from resources.hello_world import HelloWorld
 from config import Config
-from resources.images import Images
+from resources.images import Images, Thumbnails
 from models.store import Store
 """
 Main script to initialize falcon app
@@ -12,10 +12,12 @@ Main script to initialize falcon app
 def create_app(config=None):
     config = config or Config()
 
+    store = Store(config)
+
     # Initialize the Resource object
     hello_world = HelloWorld()
-    store = Store(config)
     images = Images(config, store)
+    thumbnails = Thumbnails(store)
 
     # Initialize the Falcon App
     app = falcon.asgi.App()
@@ -23,6 +25,8 @@ def create_app(config=None):
     app.add_route('/hello', hello_world)
     app.add_route('/images', images)
     app.add_route('/images/{image_id:uuid}.jpeg', images, suffix="image")
+    app.add_route('/thumbnails/{image_id:uuid}/{width:int}x{height:int}.jpeg',
+                  thumbnails)
 
     return app
 
