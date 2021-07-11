@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  backend:
+    container_name: backend
+    build: ./backend
+    restart: always
+    volumes:
+      - ./backend:/home/appuser/.
+    ports:
+      - 5000:5000
+    networks:
+      - backnet
+    #        command: gunicorn -w 1 -b 0.0.0.0:5000 app:api --reload
+    command: uvicorn --host 0.0.0.0 --port 5000 asgi:app --reload
+
+networks:
+  backnet:
